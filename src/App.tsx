@@ -1,14 +1,17 @@
 import "./App.css";
-import { useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import { getQuestionsQuizz1, getQuestionsQuizz2 } from "./utils/fetcher";
 import { Questions } from "./type";
 import { RandomFiveQuestions } from "./utils/randomFiveQuestions";
-import { Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Layout from "./components/Layout";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router } from "react-router-dom";
 import QuizzContainer from "./components/quizz/QuizzContainer";
+import { InfinitySpin } from "react-loader-spinner";
 
 const queryClient = new QueryClient();
 
@@ -48,13 +51,25 @@ function App() {
   });
 
   if (isLoadingQuizz1 || isLoadingQuizz2) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <InfinitySpin />
+      </div>
+    );
   }
   if (errorQuizz1 || errorQuizz2) {
-    return <div>Something went wrong</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Something went wrong
+      </div>
+    );
   }
   if (!dataQuizz1 || !dataQuizz2) {
-    return <div>No questions available</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        No questions available
+      </div>
+    );
   }
 
   const randomFiveQuestionsQuizz1 = RandomFiveQuestions(dataQuizz1);

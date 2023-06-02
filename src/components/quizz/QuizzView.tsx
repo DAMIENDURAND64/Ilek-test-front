@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 import QuizzTittle from "./QuizzTittle";
 import { QuizzViewsProps } from "../../type";
 import QuizzQuestions from "./QuizzQuestions";
+import QuizzResult from "./QuizzResult";
 
 const QuizzView = ({
   randomFiveQuestionsQuizz1,
@@ -13,12 +13,9 @@ const QuizzView = ({
   isAllQuestionsAnswered,
   resultQuizz1,
   resultQuizz2,
+  handleStartQuizz2,
+  handleRefetchData,
 }: QuizzViewsProps) => {
-  const navigate = useNavigate();
-
-  const handleStartQuizz2 = () => {
-    navigate("/quizz2");
-  };
   return (
     <div className="flex flex-col items-center gap-10 p-5 w-screen h-full">
       <div className="">
@@ -48,16 +45,22 @@ const QuizzView = ({
               label="Valider"
               disabled={!isAllQuestionsAnswered}
             />
-            {randomFiveQuestionsQuizz1 && resultQuizz1 && (
-              <div>
-                <p>Score: {resultQuizz1.correctAnswersCount * 20} / 100 !!</p>
-              </div>
-            )}
-            {randomFiveQuestionsQuizz2 && resultQuizz2 && (
-              <div>
-                <p>Score: {resultQuizz2.correctAnswersCount * 20} / 1 !!</p>
-              </div>
-            )}
+            {isAllQuestionsAnswered &&
+              randomFiveQuestionsQuizz1 &&
+              resultQuizz1 && (
+                <QuizzResult
+                  resultQuizz={resultQuizz1}
+                  handleRefetchData={handleRefetchData}
+                />
+              )}
+            {isAllQuestionsAnswered &&
+              randomFiveQuestionsQuizz2 &&
+              resultQuizz2 && (
+                <QuizzResult
+                  resultQuizz={resultQuizz2}
+                  handleRefetchData={handleRefetchData}
+                />
+              )}
           </div>
         </form>
 
@@ -65,7 +68,7 @@ const QuizzView = ({
           {randomFiveQuestionsQuizz1 && (
             <p
               onClick={handleStartQuizz2}
-              className="text-xs underline text-blue-600 cursor-pointer"
+              className="text-xs underline text-blue-600 cursor-pointer pt-2"
             >
               Passe un autre quizz pour découvrir comment tu peux aider à
               proteger l'environnement

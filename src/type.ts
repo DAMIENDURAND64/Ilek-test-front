@@ -5,17 +5,6 @@ import {
   UseFormRegister,
 } from "react-hook-form";
 
-export type Answer = {
-  id: number;
-  answer: string;
-};
-
-export type Questions = {
-  id: number;
-  question: string;
-  answers: Answer[];
-};
-
 export type QuizzContainerProps = {
   randomFiveQuestionsQuizz1?: Questions[];
   randomFiveQuestionsQuizz2?: Questions[];
@@ -29,6 +18,12 @@ export type QuizzViewsProps = {
   isAllQuestionsAnswered: boolean;
   resultQuizz1?: Result;
   resultQuizz2?: Result;
+  handleStartQuizz2: () => void;
+  handleRefetchData: () => void;
+};
+
+export type QuizzTittleProps = {
+  randomFiveQuestionsQuizz1?: Questions[];
 };
 
 export type QuizzQuestionsProps = {
@@ -36,8 +31,20 @@ export type QuizzQuestionsProps = {
   register: UseFormRegister<FieldValues>;
 };
 
-export type Result = {
-  correctAnswersCount: number;
+export type QuizzResultProps = {
+  resultQuizz: any;
+  handleRefetchData: () => void;
+};
+
+export type Questions = {
+  id: number;
+  question: string;
+  answers: Answer[];
+};
+
+export type Answer = {
+  id: number;
+  answer: string;
 };
 
 export type Response = {
@@ -45,15 +52,16 @@ export type Response = {
   answerId: number;
 };
 
-export type ButtonProps = {
-  type: "button" | "submit" | "reset";
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
+export type Result = {
+  correctAnswersCount: number;
 };
 
-export type QuizzTittleProps = {
-  randomFiveQuestionsQuizz1?: Questions[];
+export type ButtonProps = {
+  type: "button" | "submit" | "reset";
+  label?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  children?: ReactNode;
 };
 
 export type LayoutProps = {

@@ -1,18 +1,18 @@
 import { ButtonProps } from "../type";
 
-const Button = ({ type, label, onClick, disabled }: ButtonProps) => {
+const Button = ({ type, label, onClick, disabled, children }: ButtonProps) => {
   return (
     <button
       type={type}
       className={
         disabled
-          ? "border border-gray-700 bg-gray-200 p-3 rounded-full w-fit"
-          : "border border-green-700 bg-green-200 p-3 rounded-full w-fit"
+          ? "border border-gray-700 bg-gray-200 px-2 py-1 rounded-lg w-fit"
+          : "border border-green-700 bg-green-200 px-2 py-1 rounded-lg w-fit"
       }
       onClick={onClick}
       disabled={disabled}
     >
-      {label}
+      {children} {label}
     </button>
   );
 };
