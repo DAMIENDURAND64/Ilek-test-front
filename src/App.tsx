@@ -1,21 +1,90 @@
-import { useEffect, useState } from "react";
 import "./App.css";
+import { useQuery } from "@tanstack/react-query";
+import { getQuestionsQuizz1, getQuestionsQuizz2 } from "./utils/fetcher";
+import { Questions } from "./type";
+import { RandomFiveQuestions } from "./utils/randomFiveQuestions";
+import { Route, Routes } from "react-router-dom";
+import Home from "./components/Home";
+import Layout from "./components/Layout";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter as Router } from "react-router-dom";
+import QuizzContainer from "./components/quizz/QuizzContainer";
 
-function App() {
-  const [questions, setQuestions] = useState<any>();
+const queryClient = new QueryClient();
 
-  useEffect(() => {
-    fetch("/environment_questions")
-      .then((response) => response.json())
-      .then((data) => setQuestions(data));
-  }, []);
-
+function Root() {
   return (
-    <div className="App">
-      <h1>Teste tes connaissances</h1>
-      <p>{JSON.stringify(questions)}</p>
+    <div>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <App />
+        </Router>
+      </QueryClientProvider>
     </div>
   );
 }
 
-export default App;
+export default Root;
+
+function App() {
+  const {
+    isLoading: isLoadingQuizz1,
+    error: errorQuizz1,
+    data: dataQuizz1,
+  } = useQuery<Questions[]>({
+    queryKey: ["getQuestionsQuizz1"],
+    queryFn: getQuestionsQuizz1,
+    staleTime: Infinity,
+  });
+
+  const {
+    isLoading: isLoadingQuizz2,
+    error: errorQuizz2,
+    data: dataQuizz2,
+  } = useQuery<Questions[]>({
+    queryKey: ["getQuestionsQuizz2"],
+    queryFn: getQuestionsQuizz2,
+    staleTime: Infinity,
+  });
+
+  if (isLoadingQuizz1 || isLoadingQuizz2) {
+    return <div>Loading...</div>;
+  }
+  if (errorQuizz1 || errorQuizz2) {
+    return <div>Something went wrong</div>;
+  }
+  if (!dataQuizz1 || !dataQuizz2) {
+    return <div>No questions available</div>;
+  }
+
+  const randomFiveQuestionsQuizz1 = RandomFiveQuestions(dataQuizz1);
+  const randomFiveQuestionsQuizz2 = RandomFiveQuestions(dataQuizz2);
+
+  return (
+    <div>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/quizz1"
+            element={
+              <QuizzContainer
+                randomFiveQuestionsQuizz1={randomFiveQuestionsQuizz1}
+              />
+            }
+          />
+          <Route
+            path="/quizz2"
+            element={
+              <QuizzContainer
+                randomFiveQuestionsQuizz2={randomFiveQuestionsQuizz2}
+              />
+            }
+          />
+        </Routes>
+      </Layout>
+    </div>
+  );
+}
+
+export { App };
