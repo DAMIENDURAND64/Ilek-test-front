@@ -67,7 +67,7 @@ describe("Fetcher functions", () => {
   // test post answer quizz 1
 
   test("Post answer quizz 1", async () => {
-    const dataTest = [{ questionId: 1, answerId: 1 }];
+    const dataTest = { 1: "1" };
 
     fetchMock.mockResponseOnce(JSON.stringify(dataTest));
     const response = await fetchMock("check_answers_environment", {
@@ -91,7 +91,7 @@ describe("Fetcher functions", () => {
   // test post answer quizz 2
 
   test("Post answer quizz 2", async () => {
-    const dataTest = [{ questionId: 1, answerId: 1 }];
+    const dataTest = { 1: "1" };
 
     fetchMock.mockResponseOnce(JSON.stringify(dataTest));
     const response = await fetchMock("check_answers_mitigation", {

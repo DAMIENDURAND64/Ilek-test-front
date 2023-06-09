@@ -13,10 +13,10 @@ const QuizzQuestions = ({ question, register }: QuizzQuestionsProps) => {
               </td>
               <td>
                 <input
-                  {...register(`question${question.id}`)}
+                  {...register(`${question.id}`)}
                   type="radio"
                   value={answer.id}
-                  name={`question${question.id}`}
+                  name={`${question.id}`}
                 />
               </td>
             </tr>

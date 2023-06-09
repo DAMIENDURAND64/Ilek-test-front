@@ -1,72 +1,75 @@
 import { useCallback, useEffect, useState } from "react";
-import { QuizzContainerProps, Result } from "../../type";
-import { FieldValues, useForm } from "react-hook-form";
-import { postAnswersQuizz1, postAnswersQuizz2 } from "../../utils/fetcher";
+import { Questions, QuizzContainerProps, Response, Result } from "../../type";
+import { useForm } from "react-hook-form";
 
 import QuizzView from "./QuizzView";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { InfinitySpin } from "react-loader-spinner";
 
 const QuizzContainer = ({
-  randomFiveQuestionsQuizz1,
-  randomFiveQuestionsQuizz2,
+  fetchQuestions,
+  postAnswer,
+  nextQuizz,
 }: QuizzContainerProps) => {
   const { register, handleSubmit, watch, reset } = useForm();
-  const [resultQuizz1, setResultQuizz1] = useState<Result>();
-  const [resultQuizz2, setResultQuizz2] = useState<Result>();
+  const [resultQuizz, setResultQuizz] = useState<Result>();
   const [isAllQuestionsAnswered, setIsAllQuestionsAnswered] = useState(false);
-  const client = useQueryClient();
+  const [quizzData, setQuizzData] = useState<Questions[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await fetchQuestions();
+      setQuizzData(result);
+      setResultQuizz(undefined);
+      setIsLoading(false);
+    } catch (error) {
+      console.log("An error occurred while fetching questions.");
+      setIsLoading(false);
+    }
+  }, [fetchQuestions]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleRefetchData = () => {
+    reset();
+    setIsAllQuestionsAnswered(false);
+    fetchData();
+  };
 
   const answers = watch();
 
   useEffect(() => {
     let allAnswered;
+    if (isLoading) return;
 
-    if (randomFiveQuestionsQuizz1) {
-      allAnswered = randomFiveQuestionsQuizz1.every(
-        (question) => answers[`question${question.id}`] !== null
-      );
-    } else if (randomFiveQuestionsQuizz2) {
-      allAnswered = randomFiveQuestionsQuizz2.every(
-        (question) => answers[`question${question.id}`] !== null
+    if (quizzData) {
+      allAnswered = quizzData.every(
+        (question) => answers[`${question.id}`] !== null
       );
     }
     setIsAllQuestionsAnswered(!!allAnswered);
-  }, [answers, randomFiveQuestionsQuizz1, randomFiveQuestionsQuizz2]);
+  }, [answers, quizzData, isLoading]);
 
   useEffect(() => {
     setIsAllQuestionsAnswered(false);
   }, [navigate]);
 
-  const onSubmit = async (data: FieldValues) => {
-    const selectedQuizz =
-      randomFiveQuestionsQuizz1 ?? randomFiveQuestionsQuizz2;
-    const postAnswers = randomFiveQuestionsQuizz1
-      ? postAnswersQuizz1
-      : postAnswersQuizz2;
-    const setResult = randomFiveQuestionsQuizz1
-      ? setResultQuizz1
-      : setResultQuizz2;
-
-    if (!selectedQuizz || !postAnswers) {
-      console.error("No quiz selected or no answer function provided");
+  const onSubmit = async (data: Response) => {
+    if (!quizzData || !postAnswer) {
+      console.log("Please answer all questions.");
+      alert("Please answer all questions.");
       return;
     }
-
-    const responses = selectedQuizz.map((question) => {
-      const selectedAnswerId = parseInt(data[`question${question.id}`]);
-      return {
-        questionId: question.id,
-        answerId: selectedAnswerId,
-      };
-    });
-
     try {
-      const result = await postAnswers(responses);
-      setResult(result);
+      const result = await postAnswer(data);
+      setResultQuizz(result);
     } catch (error) {
-      console.error("Error submitting answers", error);
+      console.log("Error submitting answers", error);
       alert("An error occurred while submitting answers.");
     }
   };
@@ -75,31 +78,24 @@ const QuizzContainer = ({
     navigate("/quizz2");
   };
 
-  const handleRefetchData = useCallback(() => {
-    if (randomFiveQuestionsQuizz1) {
-      client.invalidateQueries(["getQuestionsQuizz1"]);
-    }
-    if (randomFiveQuestionsQuizz2) {
-      client.invalidateQueries(["getQuestionsQuizz2"]);
-    }
-    setIsAllQuestionsAnswered(false);
-    setResultQuizz1(undefined);
-    setResultQuizz2(undefined);
-    reset();
-  }, [client, randomFiveQuestionsQuizz1, randomFiveQuestionsQuizz2, reset]);
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <InfinitySpin />
+      </div>
+    );
+  }
   return (
     <QuizzView
-      randomFiveQuestionsQuizz1={randomFiveQuestionsQuizz1}
-      randomFiveQuestionsQuizz2={randomFiveQuestionsQuizz2}
+      quizzData={quizzData}
       handleSubmit={handleSubmit}
       onSubmit={onSubmit}
       register={register}
-      resultQuizz1={resultQuizz1}
-      resultQuizz2={resultQuizz2}
+      resultQuizz={resultQuizz}
       isAllQuestionsAnswered={isAllQuestionsAnswered}
       handleStartQuizz2={handleStartQuizz2}
       handleRefetchData={handleRefetchData}
+      nextQuizz={nextQuizz}
     />
   );
 };

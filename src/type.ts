@@ -6,24 +6,24 @@ import {
 } from "react-hook-form";
 
 export type QuizzContainerProps = {
-  randomFiveQuestionsQuizz1?: Questions[];
-  randomFiveQuestionsQuizz2?: Questions[];
+  fetchQuestions: () => Promise<Questions[]>;
+  postAnswer: (responses: Response) => Promise<Result>;
+  nextQuizz?: string;
 };
 export type QuizzViewsProps = {
-  randomFiveQuestionsQuizz1: Questions[] | undefined;
-  randomFiveQuestionsQuizz2: Questions[] | undefined;
+  quizzData: Questions[];
+  resultQuizz: Result | undefined;
   handleSubmit: UseFormHandleSubmit<FieldValues>;
-  onSubmit: (data: FieldValues) => Promise<void>;
+  onSubmit: (data: Response) => Promise<void>;
   register: UseFormRegister<FieldValues>;
   isAllQuestionsAnswered: boolean;
-  resultQuizz1?: Result;
-  resultQuizz2?: Result;
-  handleStartQuizz2: () => void;
   handleRefetchData: () => void;
+  handleStartQuizz2: () => void;
+  nextQuizz?: string;
 };
 
 export type QuizzTittleProps = {
-  randomFiveQuestionsQuizz1?: Questions[];
+  nextQuizz?: string;
 };
 
 export type QuizzQuestionsProps = {
@@ -32,8 +32,8 @@ export type QuizzQuestionsProps = {
 };
 
 export type QuizzResultProps = {
-  resultQuizz: any;
-  handleRefetchData: () => void;
+  resultQuizz: Result;
+  handleRefetchData?: () => void;
 };
 
 export type Questions = {
@@ -48,8 +48,7 @@ export type Answer = {
 };
 
 export type Response = {
-  questionId: number;
-  answerId: number;
+  [key: string]: string;
 };
 
 export type Result = {
