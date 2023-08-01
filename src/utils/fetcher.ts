@@ -1,4 +1,4 @@
-import { Response } from "../type";
+import { Payload } from "../type";
 
 // GET
 export const getQuestionsQuizz1 = async () => {
@@ -14,7 +14,7 @@ export const getQuestionsQuizz2 = async () => {
 };
 
 // POST
-export const postAnswersQuizz1 = async (responses: Response) => {
+export const postAnswersQuizz1 = async (responses: Payload[]) => {
   try {
     const response = await fetch(
       "http://localhost:3001/check_answers_environment",
@@ -36,7 +36,7 @@ export const postAnswersQuizz1 = async (responses: Response) => {
   }
 };
 
-export const postAnswersQuizz2 = async (responses: Response) => {
+export const postAnswersQuizz2 = async (responses: Payload[]) => {
   try {
     const response = await fetch(
       "http://localhost:3001/check_answers_mitigation",

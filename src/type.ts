@@ -1,20 +1,21 @@
 import { ReactNode } from "react";
 import {
   FieldValues,
+  SubmitHandler,
   UseFormHandleSubmit,
   UseFormRegister,
 } from "react-hook-form";
 
 export type QuizzContainerProps = {
   fetchQuestions: () => Promise<Questions[]>;
-  postAnswer: (responses: Response) => Promise<Result>;
+  postAnswer: (responses: Payload[]) => Promise<Result>;
   nextQuizz?: string;
 };
 export type QuizzViewsProps = {
   quizzData: Questions[];
   resultQuizz: Result | undefined;
   handleSubmit: UseFormHandleSubmit<FieldValues>;
-  onSubmit: (data: Response) => Promise<void>;
+  onSubmit: SubmitHandler<FieldValues>;
   register: UseFormRegister<FieldValues>;
   isAllQuestionsAnswered: boolean;
   handleRefetchData: () => void;
@@ -51,8 +52,13 @@ export type Response = {
   [key: string]: string;
 };
 
+export type Payload = {
+  questionId: number;
+  answer: string;
+};
+
 export type Result = {
-  correctAnswersCount: number;
+  correctAnswers: number;
 };
 
 export type ButtonProps = {

@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { Questions, QuizzContainerProps, Response, Result } from "../../type";
+import {
+  Payload,
+  Questions,
+  QuizzContainerProps,
+  Response,
+  Result,
+} from "../../type";
 import { useForm } from "react-hook-form";
 
 import QuizzView from "./QuizzView";
@@ -60,13 +66,23 @@ const QuizzContainer = ({
   }, [navigate]);
 
   const onSubmit = async (data: Response) => {
+    const questionsAnswered = Object.entries(data).filter(
+      ([, value]) => value !== null
+    );
+
+    const payload: Payload[] = questionsAnswered.map(
+      ([questionId, answer]) => ({
+        questionId: Number(questionId),
+        answer,
+      })
+    );
     if (!quizzData || !postAnswer) {
       console.log("Please answer all questions.");
       alert("Please answer all questions.");
       return;
     }
     try {
-      const result = await postAnswer(data);
+      const result = await postAnswer(payload);
       setResultQuizz(result);
     } catch (error) {
       console.log("Error submitting answers", error);
@@ -75,6 +91,7 @@ const QuizzContainer = ({
   };
 
   const handleStartQuizz2 = () => {
+    reset();
     navigate("/quizz2");
   };
 
